@@ -5,12 +5,25 @@ app = Flask(__name__)
 
 # 初始化交易所（这里以Binance为例）
 coinbase = ccxt.coinbase()
+binance = ccxt.binance()
 
-@app.route('/price', methods=['GET'])
-def get_price():
+@app.route('/coinbase_price', methods=['GET'])
+def get_coinbase_price():
     symbol = request.args.get('symbol', 'BTC/USDT')
     try:
         ticker = coinbase.fetch_ticker(symbol)
+        return jsonify({
+            'symbol': symbol,
+            'price': ticker['last']
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/binance_price', methods=['GET'])
+def get_binance_price():
+    symbol = request.args.get('symbol', 'BTC/USDT')
+    try:
+        ticker = binance.fetch_ticker(symbol)
         return jsonify({
             'symbol': symbol,
             'price': ticker['last']
